@@ -77,8 +77,18 @@ function Raidinfos:SaveRaids()
 	
 end
 
-function Raidinfos:ShowRaidinfos()
-	Raidinfos.RaidinfosFrameVar = Raidinfos:createRaidinfosFrame()
+function Raidinfos:ShowRaidinfos(param1)
+	if Raidinfos.RaidinfosFrameVar then
+		Raidinfos.RaidinfosFrameVar:Hide()
+		Raidinfos.RaidinfosFrameVar = nil
+	end
+	
+	if param1 and strlower(param1) == "matrix" then
+		Raidinfos.RaidinfosFrameVar = Raidinfos:createRaidinfosMatrixFrame()
+	else
+		Raidinfos.RaidinfosFrameVar = Raidinfos:createRaidinfosFrame()
+	end
+	
 	if Raidinfos.RaidinfosFrameVar then 
 		Raidinfos.RaidinfosFrameVar:Show()
 	end
@@ -98,7 +108,7 @@ function Raidinfos:createRaidinfosFrame()
 	f:SetStatusText("")
 	f:SetLayout("Flow")
 	f:SetWidth(640)
-	f:SetHeight(200)
+	f:SetHeight(250)
 	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
 	
 	-- close on escape
@@ -181,6 +191,130 @@ function Raidinfos:createRaidinfosFrame()
 			end
 		end
 	end
+	
+	local empty = AceGUI:Create("Label")
+	empty:SetText(" ")
+	empty:SetRelativeWidth(1)
+	s:AddChild(empty)
+	
+	local bt = AceGUI:Create("Button")
+	bt:SetText("Matrix " .. GetRealmName())
+	bt:SetRelativeWidth(0.4)
+	bt:SetCallback("OnClick", function() Raidinfos:ShowRaidinfos("matrix") end)
+	s:AddChild(bt)
+
+	
+	return f
+end
+
+
+function Raidinfos:createRaidinfosMatrixFrame()
+	local AceGUI = LibStub("AceGUI-3.0")
+
+	Raidinfos:SaveRaids()
+	if Raidinfos.db.global.savedinstances == nil then 
+		Raidinfos:Print("No Lockouts.")
+		return;
+	end
+	if Raidinfos.db.global.savedinstances[GetRealmName()] == nil then 
+		Raidinfos:Print("No Lockouts for " .. GetRealmName())
+		return;
+	end
+	
+	local f = AceGUI:Create("Frame")
+	f:SetTitle("Raid Matrix " .. GetRealmName())
+	f:SetStatusText("")
+	f:SetLayout("Flow")
+	f:SetWidth(640)
+	f:SetHeight(250)
+	f:SetCallback("OnClose",function(widget) AceGUI:Release(widget) end)
+	
+	-- close on escape
+	_G["RaidinfosMatrixFrame"] = f.frame
+	tinsert(UISpecialFrames, "RaidinfosMatrixFrame")
+	
+	scrollcontainer = AceGUI:Create("SimpleGroup") -- "InlineGroup" is also good
+	scrollcontainer:SetFullWidth(true)
+	scrollcontainer:SetFullHeight(true) -- probably?
+	scrollcontainer:SetLayout("Fill") -- important!
+
+	f:AddChild(scrollcontainer)
+
+	s = AceGUI:Create("ScrollFrame")
+	s:SetLayout("Flow") -- probably?
+	scrollcontainer:AddChild(s)
+
+	-- show only current realm
+	local instances = {}
+	
+	players = Raidinfos.db.global.savedinstances[GetRealmName()]
+	for player,raids in pairs(players) do
+		for i,raid in pairs(raids) do
+			instances[raid["n"]] = raid["n"]
+		end
+	end
+
+	count = 0
+	for _ in pairs(instances) do count = count + 1 end
+	
+	perc = 1 / (count+1)
+	
+	local lb = AceGUI:Create("Label")
+	lb:SetText("Player")
+	lb:SetColor(0,0.6,1)
+	lb:SetRelativeWidth(perc)
+	s:AddChild(lb)
+	
+	for raid,r2 in pairs(instances) do
+		local lb = AceGUI:Create("Label")
+		lb:SetText(r2)
+		lb:SetColor(0.8,0,0.8)
+		lb:SetRelativeWidth(perc)
+		s:AddChild(lb)
+	end
+
+
+  	for player,raids in pairs(players) do
+		
+		local lb = AceGUI:Create("Label")
+		lb:SetText(player)
+		lb:SetRelativeWidth(perc)
+		s:AddChild(lb)
+	
+		for iraid, raid in pairs(instances) do
+
+			found = false
+			
+			for id,r in pairs(raids) do
+				if (r["n"] == raid) then
+				    found = true
+					local lb = AceGUI:Create("Label")
+					lb:SetText(strmatch(r["s"],"^%d+%s[^%s*]+%s%d+"))
+					lb:SetRelativeWidth(perc)
+					s:AddChild(lb)
+				end
+			end
+			
+			if not found then
+				local lb = AceGUI:Create("Label")
+				lb:SetText("-")
+				lb:SetRelativeWidth(perc)
+				s:AddChild(lb)
+			end
+		
+		end
+	end
+
+	local empty = AceGUI:Create("Label")
+	empty:SetText(" ")
+	empty:SetRelativeWidth(1)
+	s:AddChild(empty)
+	
+	local bt = AceGUI:Create("Button")
+	bt:SetText("List")
+	bt:SetRelativeWidth(2*perc)
+	bt:SetCallback("OnClick", function() Raidinfos:ShowRaidinfos() end)
+	s:AddChild(bt)
 	
 	return f
 end
