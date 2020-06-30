@@ -1,2 +1,5 @@
 # raidinfos
-WoW Classic addon: display raid instance ids for all characters
+Raidinfos - WoW Classic Addon
+
+Saves raid instance lockouts over all characters. Use /raidinfos to display.
+

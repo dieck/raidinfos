@@ -1,0 +1,10 @@
+## Interface: 11304
+## Title: Raidinfos
+## Notes: Shows saved Raid instance lockouts over all characters
+## Author: dieck
+## Version: 0.1
+## SavedVariables: RaidinfosDB
+
+embeds.xml
+
+core.lua
