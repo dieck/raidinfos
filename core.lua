@@ -32,7 +32,7 @@ end
 
 
 function Raidinfos:RemoveOldRaids()
-	if Raidinfos.db.global.savedinstances[GetUnitName("player")] == nil then return end
+	if Raidinfos.db.global.savedinstances == nil then return end
 	
 	for realm,players in pairs(Raidinfos.db.global.savedinstances) do
 		for player,raids in pairs(players) do
