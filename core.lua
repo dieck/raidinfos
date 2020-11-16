@@ -55,6 +55,12 @@ function Raidinfos:SaveRaids()
 	player = GetUnitName("player")
 	realm = GetRealmName()
 	
+	-- only save instances for players from lvl 50 (ZG access) on 
+	-- otherwise Matrix would will up with Twinks and Bank Chars
+	if UnitLevel("player") < 50 then
+	    return;
+	end
+	
 	-- longest (current, Classic) realm for debug purposes
 	-- realm = "Hydraxian Waterlords"
 	
