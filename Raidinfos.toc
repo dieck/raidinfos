@@ -1,8 +1,8 @@
-## Interface: 11307
+## Interface: 20501
 ## Title: Raidinfos
 ## Notes: Shows saved Raid instance lockouts over all characters
 ## Author: dieck
-## Version: 20210421
+## Version: 20210521
 ## SavedVariables: RaidinfosDB
 
 embeds.xml
